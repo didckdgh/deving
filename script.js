@@ -119,6 +119,11 @@ function displayCartItems() {
     });
 }
 
+//처음부터 상품 띄우기
+window.onload = function () {
+    filterCategory('all');
+    displayCartItems();
+};
 
 // 장바구니 수정 모달 열기
 function openEditModal(index) {

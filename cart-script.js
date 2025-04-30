@@ -11,6 +11,56 @@ let products = [
 
 
 function displayCartItems() {
+    const cartContainer = document.getElementById('cart-items');
+    const totalPriceElement = document.getElementById('total-price');
+    cartContainer.innerHTML = '';
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        const product = products.find(p => p.name === item.name);
+        const cartItemDiv = document.createElement('div');
+        cartItemDiv.classList.add('cart-item');
+
+        const productImage = document.createElement('img');
+        productImage.src = product.imageUrl;
+        productImage.alt = product.name;
+        productImage.classList.add('cart-item-image');
+
+        const itemDetails = document.createElement('div');
+        itemDetails.classList.add('item-details');
+        itemDetails.innerHTML = `
+            <h4>${product.name}</h4>
+            <p>수량: ${item.quantity}</p>
+            <p>가격: ${item.totalPrice}원</p>
+            <button onclick="openEditModal(${index})">수정</button>
+            <button onclick="removeCartItem(${index})">삭제</button> <!-- 삭제 버튼 추가 -->
+        `;
+
+        cartItemDiv.appendChild(productImage);
+        cartItemDiv.appendChild(itemDetails);
+        cartContainer.appendChild(cartItemDiv);
+
+        total += item.totalPrice;
+    });
+
+    totalPriceElement.textContent = `총 금액: ${total.toLocaleString()}원`; // 가격 표시
+}
+
+function removeCartItem(index) {
+    if (confirm('정말 삭제하시겠습니까?')) {
+        cart.splice(index, 1);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        displayCartItems(); // 상품 삭제 후 재렌더링
+    }
+}
+
+
+window.onload = function() {
+    displayCartItems();
+};
+
+/*
+function displayCartItems() {
     const cartItemsList = document.getElementById('cart-items');
     cartItemsList.innerHTML = '';
 
@@ -33,7 +83,7 @@ function displayCartItems() {
     const totalPrice = cart.reduce((total, item) => total + item.totalPrice, 0);
     document.getElementById('total-price').innerText = `총 금액: ${totalPrice.toLocaleString()}원`;
 }
-
+*/
 
 // 옵션 선택 모달 열기
 function openOptionModal(productName) {
@@ -93,8 +143,10 @@ function openEditModal(index) {
         editOptionSelect.appendChild(optionElement);
     });
 
+    document.getElementById('edit-modal-image').src = product.imageUrl;
+
     document.getElementById('edit-quantity').value = item.quantity;
-    document.getElementById('edit-price').innerText = `현재 가격: ${item.totalPrice}원`;
+    document.getElementById('edit-price').innerText = `${item.totalPrice}`;
 
     document.getElementById('edit-modal').style.display = 'block';
     document.getElementById('edit-modal').setAttribute('data-item-index', index);
@@ -133,6 +185,7 @@ function updatePrice() {
     document.getElementById('edit-price').innerText = newTotalPrice; // 가격 업데이트
 }
 
+
 // 수량과 옵션 변경 시 실시간으로 가격 반영
 /*function updatePrice() {
     const itemIndex = document.getElementById('edit-modal').getAttribute('data-item-index');
@@ -163,6 +216,7 @@ function clearCart() {
 // 구매 진행
 function checkout() {
     alert('구매 진행');
+    clearCart(); // 구매 후 비우기
 }
 
 // 초기화
